@@ -1,0 +1,44 @@
+# Import necessary libraries
+import hashlib
+import secrets
+
+# User database (usually stored securely, not hardcoded)
+user_database = {
+    'alice': {
+        'password_hash': '...',  # hashed password
+        'salt': '...'            # salt used in hashing
+    },
+    'bob': {
+        'password_hash': '...',
+        'salt': '...'
+    }
+    # More users...
+}
+
+# Function to register a new user
+def register(username, password):
+    salt = secrets.token_hex(16)  # Generate a random salt
+    password_hash = hashlib.sha256((password + salt).encode()).hexdigest()
+    user_database[username] = {
+        'password_hash': password_hash,
+        'salt': salt
+    }
+    print(f"User {username} successfully registered.")
+
+# Function to authenticate a user
+def authenticate(username, password):
+    if username in user_database:
+        stored_password_hash = user_database[username]['password_hash']
+        stored_salt = user_database[username]['salt']
+        input_password_hash = hashlib.sha256((password + stored_salt).encode()).hexdigest()
+        if input_password_hash == stored_password_hash:
+            print(f"Authentication successful. Welcome, {username}!")
+        else:
+            print("Authentication failed. Invalid username or password.")
+    else:
+        print("Authentication failed. Invalid username or password.")
+
+# Example usage
+register('alice', 'password123')
+authenticate('alice', 'password123')
+authenticate('alice', 'wrongpassword')
